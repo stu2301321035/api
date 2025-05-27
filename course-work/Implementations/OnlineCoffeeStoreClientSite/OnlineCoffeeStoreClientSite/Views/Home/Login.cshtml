@@ -1,0 +1,45 @@
+﻿@model OnlineCoffeeStoreClientSite.DTOs.LoginRequest;
+
+@{
+    this.Layout = "/Views/Shared/_lAYOUT.cshtml";
+    ViewData["title"] = "LOGIN";
+}
+
+    <h2>LOGIN</h2>
+
+    <form action="/Home/Login" method="post">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>
+                        @Html.LabelFor(m => m.Email)
+                    </th>
+                    <td>
+                        @Html.TextBoxFor(m=>m.Email)
+                        @Html.ValidationMessageFor(m=>m.Email)
+                    </td>
+                </tr> 
+                <tr>
+                    <th>
+                        @Html.LabelFor(m => m.Password)
+                    </th>
+                    <td>
+                        @Html.TextBoxFor(m => m.Password)
+                        @Html.ValidationMessageFor(m => m.Password)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.ValidationMessage("authError", new { @class = "error right" })
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-end">
+                        <button type="submit" class="btn btn-success">Create</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+       
+
+    </form>

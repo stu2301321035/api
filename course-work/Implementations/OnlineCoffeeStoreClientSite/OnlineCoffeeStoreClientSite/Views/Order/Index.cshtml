@@ -1,0 +1,306 @@
+﻿@model IEnumerable<OnlineCoffeeStoreClientSite.Models.Order>
+@{
+    var role = ViewBag.Role; 
+    Pager pager = new Pager();
+    int pageNo = 0;
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+<head>
+    <style>
+        td.order-items, th.order-items {
+        max-width: 340px;
+        min-width: 250px;
+        white-space: normal;
+        word-wrap: break-word;
+        }
+
+        td.operations, th.operations {
+        max-width: 150px;
+        min-width: 100px;
+        white-space: normal;
+        }
+
+        .table td, .table th {
+        vertical-align: top;
+        }
+    </style>
+
+</head>
+<body>
+    <h2>Orders</h2>
+
+    <div class="d-flex align-items-center mb-3 gap-2">
+        @if (role != "Customer")
+        {
+            <form asp-controller="Order" asp-action="Create" method="get" class="m-0">
+                <button type="submit" class="btn btn-primary">New</button>
+            </form>
+        }
+        <button type="button" class="btn btn-secondarys" id="filterBtn">Filter</button>
+    </div>
+
+    <div id="filterContainer" style="display: none; margin-top:10px">
+        <div class="row mb-2">
+            <div class="col-3">
+                <select class="form-control" id="filterType">
+                    <option value="userSearch">Search by User</option>
+                    <option value="dateAndStatusSearch">Search by Date and Status</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Скриваме по подразбиране и двете форми, ще показваме нужната с JavaScript -->
+        <form asp-controller="Order" asp-action="SearchByUser" method="get" id="userForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <select name="userId" class="form-control">
+                        <option value="">-- Select User --</option>
+                        @{
+                            var users = ViewBag.UserOptions as List<SelectListItem>;
+
+                            if (users != null)
+                            {
+                                foreach (var user in users)
+                                {
+
+                                    <option value="@user.Value">@user.Text</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <form asp-controller="Order" asp-action="SearchByDateAndStatus" method="get" id="dateAndStatusForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <input type="date" name="orderDate" placeholder="Order Date" class="form-control" />
+                </div>
+                <div class="col-3">
+                    <input type="text" name="status" placeholder="Status" class="form-control" />
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-outline-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Покажи/скрий филтър контейнера
+        document.getElementById('filterBtn').addEventListener('click', function () {
+        var container = document.getElementById('filterContainer');
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Превключване между формите
+        document.getElementById('filterType').addEventListener('change', function () {
+        var selected = this.value;
+        document.getElementById('userForm').style.display = selected === 'userSearch' ? 'block' : 'none';
+        document.getElementById('dateAndStatusForm').style.display = selected === 'dateAndStatusSearch' ? 'block' : 'none';
+        });
+
+        // Показване на формата по подразбиране при зареждане
+        window.addEventListener('DOMContentLoaded', function () {
+        var selected = document.getElementById('filterType').value;
+        document.getElementById('userForm').style.display = selected === 'userSearch' ? 'block' : 'none';
+        document.getElementById('dateAndStatusForm').style.display = selected === 'dateAndStatusSearch' ? 'block' : 'none';
+        });
+
+        function setAddOrderId(orderId) {
+        document.getElementById('addItem').value = orderId;
+        }
+
+        function setRemoveOrderId(orderId) {
+        document.getElementById('removeItem').value = orderId;
+        }
+    </script>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Payment Method</th>
+                <th>User's Names</th>
+                <th class="order-items">Order Items</th>
+                <th class="operations">Operations</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (Order order in Model)
+            {
+                <tr>
+                    <td>@order.OrderDate</td>
+                    <td>@order.Status</td>
+                    <td>@order.Notes</td>
+                    <td>@order.PaymentMethod</td>
+                    <td>
+                        @{
+                            var users = ViewBag.UserOptions as List<SelectListItem>;
+                            var user = users?.FirstOrDefault(u => u.Value == order.UsersId.ToString());
+                        }   @user?.Text
+                    </td>
+                    <td class="order-items">
+
+                        @foreach (var orderItem in order?.OrderItems)
+                        {
+                            <div class="mb-2">
+                                <strong>Item @orderItem.Id:</strong><br />
+                                @{
+                                    var coffees = ViewBag.Coffees as SelectList;
+                                    var coffee = coffees?.FirstOrDefault(c => c.Value == orderItem.CoffeeId.ToString());
+                                }
+                                Coffee: @coffee?.Text,
+                                Quantity: @orderItem.Quantity,
+                                <br>
+                                Price: @orderItem.UnitPrice лв. ,
+                                Discount: @orderItem.DiscountPercentage , 
+                                Total Price: @orderItem.TotalPrice
+                            </div>
+
+                        }
+                    </td>
+
+                    @if (role != "Customer" )
+                    {
+                        <td class="operations">
+                            <a asp-controller="Order" asp-action="Edit" asp-route-id="@order.Id">Edit</a><br />
+                            <a asp-controller="Order" asp-action="Delete" asp-route-id="@order.Id">Delete</a><br />
+                             <a href="#" data-bs-toggle="modal" data-bs-target="#addItemModal" onclick="setAddOrderId(@order.Id)">Add Item</a><br/>
+                            <a href="#"  data-bs-toggle="modal" data-bs-target="#removeItemModal" onclick="setRemoveOrderId(@order.Id)">Remove Item</a>
+                        </td>
+                    }
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+  
+        <div class="modal fade" id="addItemModal" aria-hidden="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" asp-controller="Order" asp-action="AddItemToOrder">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Item To Order</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="orderId" id="addItem" />
+                            <div class="mb-3">
+                                <label>Coffee</label>
+                                <select class="form-control" name="CoffeeId" required>
+                                    @foreach (var coffee in ViewBag.Coffees as SelectList)
+                                    {
+                                        <option value="@coffee.Value">@coffee.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Quantity</label>
+                                <input type="number" class="form-control" name="Quantity" min="1" required />
+                            </div>
+                            <div class="mb-3">
+                                <label>Unit Price</label>
+                                <input type="number" class="form-control" name="UnitPrice" min="0" step="0.01" required />
+                            </div>
+                            <div class="mb-3">
+                                <label>Discount</label>
+                                <input type="number" class="form-control" name="DiscountPercentage" min="0" step="0.01" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Add Item</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
+
+    <a asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary" style="margin-top: 10px;">Back</a>
+
+   
+  
+    <!-- Add Item Modal -->
+    <div class="modal fade" id="removeItemModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="get" asp-controller="Order" asp-action="RemoveItemFromOrder">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Remove Item To Order</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="orderId" id="removeItem" />
+                        <div class="mb-3">
+                            <label>Order Item Id</label>
+                            <input type="number" class="form-control" name="orderItemId" min="1" required />
+                        </div>
+                       
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Remove Item</button>
+                        <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="container">
+        @if (pager.TotalPages > 0)
+        {
+            <ul class="pagination justify-content-end">
+
+                @if (pager.CurrentPage > 1)
+                {
+                    <li class="page item">
+                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pg="1">First</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                    </li>
+
+                }
+
+                @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge==pager.CurrentPage? "active" : "")">
+                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pg="@pge">@pge</a>
+                    </li>
+                }
+
+                @if (pager.CurrentPage < pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="Order" asp-action="Index" asp-route-pg="@(pager.TotalPages)">Last</a>
+                    </li>
+
+                }
+
+            </ul>
+        }
+
+
+
+    </div>
+
+</body>

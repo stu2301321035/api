@@ -1,0 +1,110 @@
+﻿@model OnlineCoffeeStoreClientSite.Models.Order
+
+<h2>Create Order</h2>
+
+<form asp-action="Create" method="post">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.OrderDate)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.OrderDate)
+                    @Html.ValidationMessageFor(m => m.OrderDate)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.Status)
+                </th>
+                <td>
+                    @Html.DropDownListFor(m => m.Status, (IEnumerable<SelectListItem>)ViewBag.StatusOptions, "-- Select Status --")
+                    @Html.ValidationMessageFor(m => m.Status)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.Notes)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.Notes)
+                    @Html.ValidationMessageFor(m => m.Notes)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.PaymentMethod)
+                </th>
+                <td>
+                    @Html.DropDownListFor(m => m.PaymentMethod, (IEnumerable<SelectListItem>)ViewBag.PaymentOptions, "-- Select Payment --")
+                    @Html.ValidationMessageFor(m => m.PaymentMethod)
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.UsersId)
+                </th>
+                <td>
+                    @Html.DropDownListFor(m => m.UsersId, (IEnumerable<SelectListItem>)ViewBag.UserOptions, "-- Select User --")
+                    @Html.ValidationMessageFor(m => m.UsersId)
+                </td>
+            </tr>
+
+            <tr>
+                <th>Order Items</th>
+                <td>
+                    @for (int i = 0; i < Model.OrderItems?.Count; i++)
+                    {
+
+                         <table>
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @Html.Label($"OrderItems[{i}].CoffeeId", "Coffee")
+                                        </th>
+                                        <td>
+                                            @Html.DropDownList($"OrderItems[{i}].CoffeeId", (SelectList)ViewBag.Coffees, "-- Select Coffee --")
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            @Html.Label($"OrderItems[{i}].Quantity")
+                                        </th>
+                                        <td>
+                                            @Html.TextBox($"OrderItems[{i}].Quantity")
+                                        </td>
+                                    </tr>
+                                   
+                                    <tr>
+                                        <th>
+                                            @Html.Label($"OrderItems[{i}].UnitPrice")
+                                        </th>
+                                        <td>
+                                            @Html.TextBox($"OrderItems[{i}].UnitPrice")
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            @Html.Label($"OrderItems[{i}].DiscountPercentage")
+                                        </th>
+                                        <td>
+                                            @Html.TextBox($"OrderItems[{i}].DiscountPercentage")
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    }
+            </tr>
+
+            <tr>
+                <td colspan="2" class="text-end">
+
+                    <button type="submit" class="btn btn-success">Create</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  
+</form>

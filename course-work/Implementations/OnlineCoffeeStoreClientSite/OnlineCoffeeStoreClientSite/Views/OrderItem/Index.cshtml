@@ -1,0 +1,203 @@
+﻿@model IEnumerable<OnlineCoffeeStoreClientSite.Models.OrderItem>
+@{
+    var role = ViewBag.Role;
+    Pager pager = new Pager();
+    int pageNo = 0;
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+    var calculation = ViewBag.CalculatedTotal;
+}
+<body>
+    <h2>Data Processing</h2>
+
+    <div class="d-flex align-items-center mb-3 gap-2">
+
+        <button type="button" class="btn btn-secondarys" id="filterBtn">Filter</button>
+    </div>
+
+    <div id="filterContainer" style="display: none; margin-top:10px">
+        <div class="row mb-2">
+            <div class="col-3">
+                <select class="form-control" id="filterType">
+                    <option value="orderSearch">Search by Order Id</option>
+                    <option value="coffeeSearch">Search by Coffee Id</option>
+                    <option value="calculateSearch">Calculate by Order </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Скриваме по подразбиране и двете форми, ще показваме нужната с JavaScript -->
+        <form asp-controller="OrderItem" asp-action="SearchByOrderId" method="get" id="orderForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <select name="orderId" class="form-control">
+                        <option value="">-- Select Order Id --</option>
+                        @{
+                            var orders = ViewBag.OrderId as List<SelectListItem>;
+
+                            if (orders != null)
+                            {
+                                foreach (var order in orders)
+                                {
+
+                                    <option value="@order.Value">@order.Text</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-outline-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <form asp-controller="OrderItem" asp-action="SearchByCoffeeId" method="get" id="coffeeForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <select name="coffeeId" class="form-control">
+                        <option value="">-- Select Coffee --</option>
+                        @{
+                            var coffees = ViewBag.CoffeeNames as List<SelectListItem>;
+
+                            if (coffees != null)
+                            {
+                                foreach (var coffee in coffees)
+                                {
+
+                                    <option value="@coffee.Value">@coffee.Text</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-outline-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <form asp-controller="OrderItem" asp-action="CalculateTotalPrice" method="get" id="calculateForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <select name="orderId" class="form-control">
+                        <option value="">-- Select Order Id --</option>
+                        @{
+                            var orders = ViewBag.OrderId as List<SelectListItem>;
+
+                            if (orders != null)
+                            {
+                                foreach (var order in orders)
+                                {
+
+                                    <option value="@order.Value">@order.Text</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-outline-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Покажи/скрий филтър контейнера
+        document.getElementById('filterBtn').addEventListener('click', function () {
+        var container = document.getElementById('filterContainer');
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Превключване между формите
+         document.getElementById('filterType').addEventListener('change', function () {
+        var selected = this.value;
+        document.getElementById('orderForm').style.display = selected === 'orderSearch' ? 'block' : 'none';
+        document.getElementById('coffeeForm').style.display = selected === 'coffeeSearch' ? 'block' : 'none';
+        document.getElementById('calculateForm').style.display = selected === 'calculateSearch' ? 'block' : 'none';
+        });
+    </script>
+
+    @if (ViewBag.CalculatedTotal != null)
+    {
+        <div class="alert alert-success mt-3" role="alert">
+            <strong>Total price for the selected order:</strong> @calculation лв
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr><th>Coffee Product</th><th>Order</th><th>Quantity</th><th>Unit Price</th><th>Discount Percentage</th></tr>
+        </thead>
+        <tbody>
+            @foreach (OrderItem order in Model)
+            {
+
+                <tr>
+                    <td>
+                        @{
+                            var coffees = ViewBag.CoffeeNames as List<SelectListItem>;
+                            var coffeeName = coffees?.FirstOrDefault(c => c.Value == order.CoffeeId.ToString())?.Text ?? "Unknown";
+                        }
+                        @coffeeName
+                    </td>
+                    <td>@order.OrderId</td>
+                    <td>@order.Quantity</td>
+                    <td>@order.UnitPrice</td>
+                    <td>@order.DiscountPercentage</td>
+                    <td>
+                        @order.TotalPrice
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="OrderItem" asp-action="Index" class="btn btn-outline-secondary" style="margin-top: 10px;">Back</a>
+
+    <div class="container">
+        @if (pager.TotalPages > 0)
+        {
+            <ul class="pagination justify-content-end">
+
+                @if (pager.CurrentPage > 1)
+                {
+                    <li class="page item">
+                        <a class="page-link" asp-controller="OrderItem" asp-action="Index" asp-route-pg="1">First</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="OrderItem" asp-action="Index" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                    </li>
+
+                }
+
+                @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge==pager.CurrentPage? "active" : "")">
+                        <a class="page-link" asp-controller="OrderItem" asp-action="Index" asp-route-pg="@pge">@pge</a>
+                    </li>
+                }
+
+                @if (pager.CurrentPage < pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="OrderItem" asp-action="Index" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="OrderItem" asp-action="Index" asp-route-pg="@(pager.TotalPages)">Last</a>
+                    </li>
+
+                }
+
+            </ul>
+        }
+
+
+
+    </div>
+</body>

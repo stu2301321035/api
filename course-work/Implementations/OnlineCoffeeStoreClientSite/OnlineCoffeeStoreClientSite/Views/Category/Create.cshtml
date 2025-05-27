@@ -1,0 +1,26 @@
+﻿@model OnlineCoffeeStoreClientSite.Models.Category
+
+<h2>Create Category</h2>
+
+<form asp-action="Create" method="post">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>
+
+                    @Html.LabelFor(m => m.CategoryName)
+                </th>
+                <td>
+
+                    @Html.TextBoxFor(m => m.CategoryName)
+                    @Html.ValidationMessageFor(m => m.CategoryName, "This filed is required")
+                </td>
+            </tr>
+        </tbody>
+    </table>
+   <tr>
+        <td colspan="2" class="text-end">
+            <button type="submit" class="btn btn-success">Create</button>
+        </td>
+   </tr>
+</form>

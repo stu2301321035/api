@@ -1,0 +1,26 @@
+﻿@model IEnumerable<OnlineCoffeeStoreClientSite.Models.Category>
+
+<h2>Category</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>Type</tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                
+                <td>@item.CategoryName</td>
+                <td>
+                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a asp-controller="Category" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Category" asp-action="Index" class="btn btn-outline-secondary" style="margin-top: 30px;">Back</a>

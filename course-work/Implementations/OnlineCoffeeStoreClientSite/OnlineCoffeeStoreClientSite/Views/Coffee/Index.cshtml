@@ -1,0 +1,170 @@
+﻿@model IEnumerable<OnlineCoffeeStoreClientSite.Models.Coffee>
+@{
+    var role = ViewBag.Role;
+    Pager pager = new Pager();
+    int pageNo = 0;
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+<body>
+    <h2>Menu</h2>
+
+
+    <div class="d-flex align-items-center mb-3 gap-2">
+        @if (role != "Customer")
+        {
+            <form asp-controller="Coffee" asp-action="Create" method="get" class="m-0">
+                <button type="submit" class="btn btn-primary">New</button>
+            </form>
+        }
+        <button type="button" class="btn btn-secondary" id="filterBtn">Filter</button>
+    </div>
+    @if (role != "Customer")
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            You're allowed to create Coffee Category, click <a asp-controller="Category" asp-action="Create" class="alert-link">here</a>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div id="filterContainer" style="display:none; margin-top: 10px;">
+        <div class="row mb-2">
+            <div class="col-3">
+                <select class="form-control" id="filterType">
+                    <option value="namePrice">Search by Name and Price</option>
+                    <option value="category">Search by Category</option>
+                </select>
+            </div>
+        </div>
+
+
+        <form asp-controller="Coffee" asp-action="Search" method="get" id="namePriceForm">
+            <div class="row">
+                <div class="col-3">
+                    <input type="text" name="name" placeholder="Product Name" class="form-control" />
+                </div>
+                <div class="col-3">
+                    <input type="text" name="price" placeholder="Price" class="form-control" />
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+
+            </div>
+        </form>
+
+
+        <form asp-controller="Coffee" asp-action="FindByCategory" method="get" id="categoryForm" style="display:none;">
+            <div class="row">
+                <div class="col-3">
+                    <select name="id" class="form-control">
+                        <option value="">-- Select Category --</option>
+                        @{
+                            var categories = ViewBag.CategoryId as List<SelectListItem>;
+                            if (categories != null)
+                            {
+                                foreach (var category in categories)
+                                {
+                                    <option value="@category.Value">@category.Text</option>
+                                }
+                            }
+                        }
+
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Show/hide the filter section
+        document.getElementById('filterBtn').addEventListener('click', function () {
+        var container = document.getElementById('filterContainer');
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Switch between filter forms
+        document.getElementById('filterType').addEventListener('change', function () {
+        var selected = this.value;
+        document.getElementById('namePriceForm').style.display = selected === 'namePrice' ? 'block' : 'none';
+        document.getElementById('categoryForm').style.display = selected === 'category' ? 'block' : 'none';
+        });
+    </script>
+
+
+
+    <table class="table">
+        <thead>
+            <tr><th>Product Name</th><th>Price</th><th>Ingredients</th><th>Status</th><th>Category</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Price</td>
+                    <td>@item.Ingredients</td>
+                    <td>@item.StatusText</td>
+                    <td>@item.Category?.CategoryName</td>
+                    @if (role != "Customer")
+                    {
+                        <td>
+                            <a asp-controller="Coffee" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a asp-controller="Coffee" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="Coffee" asp-action="Index" class="btn btn-outline-secondary" style="margin-top: 10px;">Back</a>
+
+
+    <div class="container">
+        @if (pager.TotalPages > 0)
+        {
+            <ul class="pagination justify-content-end">
+
+                @if (pager.CurrentPage > 1)
+                {
+                    <li class="page item">
+                        <a class="page-link" asp-controller="Coffee" asp-action="Index" asp-route-pg="1">First</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="Coffee" asp-action="Index" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                    </li>
+
+                }
+
+                @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge==pager.CurrentPage? "active" : "")">
+                        <a class="page-link" asp-controller="Coffee" asp-action="Index" asp-route-pg="@pge">@pge</a>
+                    </li>
+                }
+
+                @if (pager.CurrentPage < pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Coffee" asp-action="Index" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="Coffee" asp-action="Index" asp-route-pg="@(pager.TotalPages)">Last</a>
+                    </li>
+
+                }
+
+            </ul>
+        }
+
+
+
+    </div>
+</body>

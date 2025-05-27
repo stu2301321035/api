@@ -1,0 +1,140 @@
+﻿
+@using OnlineCoffeeStoreClientSite.Models;
+@{
+    this.Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["title"] = "Users";
+    Pager pager = new Pager();
+    int pageNo = 0;
+    if (ViewBag.Pager!=null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+
+}
+
+<link href="/css/site.css" rel="stylesheet" />
+
+<div class="index-container">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-message">@TempData["ErrorMessage"]</div>
+    }
+    <form asp-controller="User" asp-action="Create" method="get">
+        <button type="submit" class="btn btn-primary">New</button>
+    </form>
+
+    <!-- ✅ Filter Button -->
+    <button type="button" class="btn btn-secondary" id="filterButton">Filter</button>
+
+    <!-- ✅ Filter Form (Initially hidden) -->
+    <form asp-controller="User" asp-action="Search" method="get" id="filterForm" style="display:none; margin-top: 10px;">
+        <div class="row">
+            <div class="col-2">
+                <input type="text" name="firstName" placeholder="First Name" class="form-control" />
+            </div>
+            <div class="col-2">
+                <input type="text" name="lastName" placeholder="Last Name" class="form-control" />
+            </div>
+            <div class="col-2">
+                <button type="submit" class="btn btn-secondary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // Показваме или скриваме формата при натискане на бутона "Filter"
+        document.getElementById('filterButton').addEventListener('click', function() {
+        var form = document.getElementById('filterForm');
+        // Ако формата е скрита, я показваме
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+    </script>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Activation Status</th>
+                <th>Role</th>
+                <th>Order IDs</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (User user in Model)
+            {
+                <tr>
+                    <td>@($"{user.FirstName} {user.LastName}")</td>
+                    <td>@user.Email</td>
+                    <td>@user.IsActivated</td>
+                    <td>@user.RolesString</td>
+                    <td>
+                        @if (user.Orders.Any())
+                        {
+                            @foreach (var order in user.Orders)
+                            {
+                                <span>@order.Id</span>
+
+                                <br />
+                            }
+                        }
+                        else
+                        {
+                            <span>No Orders</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+                        <a asp-controller="User" asp-action="Delete" asp-route-id="@user.Id">Delete</a>
+                    </td>
+                </tr>
+
+
+            }
+        </tbody>
+    </table>
+
+   
+
+    <div class="container">
+        @if (pager.TotalPages>0)
+        {
+            <ul class="pagination justify-content-end">
+
+                @if (pager.CurrentPage > 1)
+                {
+                    <li class="page item">
+                        <a class="page-link" asp-controller="User" asp-action="Index" asp-route-pg="1">First</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="User" asp-action="Index" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                    </li>
+                
+                }
+
+                @for (var pge = pager.StartPage; pge<=pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge==pager.CurrentPage? "active" : "")">
+                        <a class="page-link" asp-controller="User" asp-action="Index" asp-route-pg="@pge">@pge</a>
+                    </li>
+                }
+
+                @if (pager.CurrentPage < pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="User" asp-action="Index" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                    </li>
+                    <li>
+                        <a class="page-link" asp-controller="User" asp-action="Index" asp-route-pg="@(pager.TotalPages)">Last</a>
+                    </li>
+                
+                }
+
+            </ul> 
+        }
+
+      
+
+     </div>
+  
+</div>

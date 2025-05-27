@@ -1,0 +1,78 @@
+﻿@model OnlineCoffeeStoreClientSite.Models.User
+
+<h2>Create User</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="Orders" />
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.FirstName)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.FirstName)
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </td>
+                
+            </tr>  
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.LastName)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.LastName)
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </td>
+                
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.Email)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.Email)
+                    @Html.ValidationMessageFor(m => m.Email)
+                </td>
+                
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.Role)
+                </th>
+                <td>
+                    @Html.DropDownListFor(m => m.Role, (IEnumerable<SelectListItem>)ViewBag.RoleList, "-- Select Status --")
+
+                    @Html.ValidationMessageFor(m => m.Role)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.CreatedOn)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.CreatedOn)
+                    @Html.ValidationMessageFor(m => m.CreatedOn)
+                </td>
+
+            </tr> 
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.Password)
+                </th>
+                <td>
+                    @Html.TextBoxFor(m => m.Password)
+                    @Html.ValidationMessageFor(m => m.Password)
+                </td>
+
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="text-end">
+                    <button type="submit" class="btn btn-success">Create</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+   
+</form>

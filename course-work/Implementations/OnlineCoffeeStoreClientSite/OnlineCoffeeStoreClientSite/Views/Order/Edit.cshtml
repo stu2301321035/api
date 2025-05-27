@@ -1,0 +1,97 @@
+﻿@model OnlineCoffeeStoreClientSite.Models.Order
+
+@{
+    ViewData["Title"] = "Edit Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit Order</h2>
+
+<form asp-action="Edit" asp-controller="Order" method="post" asp-route-id="@Model.Id">
+  
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>@Html.LabelFor(m => m.OrderDate)</th>
+                <td>
+                    @Html.TextBoxFor(m => m.OrderDate, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.OrderDate, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.Status)</th>
+                <td>
+                    @Html.DropDownListFor(m => m.Status, (IEnumerable<SelectListItem>)ViewBag.StatusOptions, "-- Select Status --")
+                    @Html.ValidationMessageFor(m => m.Status)
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.Notes)</th>
+                <td>
+                    @Html.TextBoxFor(m => m.Notes, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.PaymentMethod)</th>
+                <td>
+                    @Html.DropDownListFor(m => m.PaymentMethod, (IEnumerable<SelectListItem>)ViewBag.PaymentOptions, "-- Select Payment --")
+                    @Html.ValidationMessageFor(m => m.PaymentMethod)
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.UsersId)</th>
+                <td>
+                    @Html.DropDownListFor(m => m.UsersId, (IEnumerable<SelectListItem>)ViewBag.UserOptions, "-- Select User --")
+                    @Html.ValidationMessageFor(m => m.UsersId)
+                </td>
+            </tr>
+
+            <tr>
+                <th>Order Items</th>
+                <td>
+                    @for (int i = 0; i < Model.OrderItems?.Count; i++)
+                    {
+                        <div class="border p-2 mb-3">
+                            @Html.HiddenFor(m => m.OrderItems[i].Id)
+                            @Html.HiddenFor(m => m.OrderItems[i].OrderId)
+
+                            <div class="mb-2">
+                                @Html.LabelFor(m => m.OrderItems[i].CoffeeId, "Coffee")
+                                @Html.DropDownListFor(m => m.OrderItems[i].CoffeeId, (SelectList)ViewBag.Coffees, "-- Select Coffee --", new { @class = "form-control" })
+                            </div>
+
+                            <div class="mb-2">
+                                @Html.LabelFor(m => m.OrderItems[i].Quantity)
+                                @Html.TextBoxFor(m => m.OrderItems[i].Quantity, new { @class = "form-control" })
+                            </div>
+
+                            <div class="mb-2">
+                                @Html.LabelFor(m => m.OrderItems[i].UnitPrice)
+                                @Html.TextBoxFor(m => m.OrderItems[i].UnitPrice, new { @class = "form-control" })
+                            </div>
+
+                            <div class="mb-2">
+                                @Html.LabelFor(m => m.OrderItems[i].DiscountPercentage)
+                                @Html.TextBoxFor(m => m.OrderItems[i].DiscountPercentage, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    }
+                </td>
+
+
+            </tr>
+
+            <tr>
+                <td colspan="2" class="text-end">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-controller="Coffee" asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

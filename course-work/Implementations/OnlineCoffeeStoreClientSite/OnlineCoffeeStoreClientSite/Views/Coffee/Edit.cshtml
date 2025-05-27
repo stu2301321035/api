@@ -1,0 +1,64 @@
+﻿@model OnlineCoffeeStoreClientSite.Models.Coffee
+
+@{
+    ViewData["Title"] = "Edit Coffee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit Coffee</h2>
+
+<form asp-action="Edit" asp-controller="Coffee" method="post" asp-route-id="@Model.Id">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Category" />
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>@Html.LabelFor(m => m.Name)</th>
+                <td>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Name, "This field is required", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.Price)</th>
+                <td>
+                    @Html.TextBoxFor(m => m.Price, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Price, "This field is required", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.Ingredients)</th>
+                <td>
+                    @Html.TextBoxFor(m => m.Ingredients, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Ingredients, "This field is required", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.Status)</th>
+                <td>
+                    @Html.DropDownListFor(m => m.Status, (IEnumerable<SelectListItem>)ViewBag.StatusOptions, "-- Select Status --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Status, "This field is required", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <th>@Html.LabelFor(m => m.CategoryId)</th>
+                <td>
+                    @Html.DropDownListFor(m => m.CategoryId, (IEnumerable<SelectListItem>)ViewBag.CategoryId, "-- Select Category --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CategoryId, "This field is required", new { @class = "text-danger" })
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" class="text-end">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-controller="Coffee" asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
